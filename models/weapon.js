@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const WeaponSchema = new Schema({
     name: {type: String, required: true}, 
-    game: {type: Schema.Types.ObjectId, ref: "Game", required: true},
     description: {type: String, required: true},
+    game: {type: Schema.Types.ObjectId, ref: "Game", required: true},
     category: [{type: Schema.Types.ObjectId, ref: "Category", required: true}],
     tier: {type: String, required: true, enum: ["Godly", "Great", "Mid", "Terrible"], default: "Mid"},    
 })
