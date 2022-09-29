@@ -12,6 +12,7 @@ const armory = require('./routes/armory')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const armoryRouter = require('./routes/armory')
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/armory', armoryRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
