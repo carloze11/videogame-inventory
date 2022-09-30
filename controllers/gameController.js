@@ -1,8 +1,18 @@
 const Game = require("../models/game");
 
 // Display list of all games.
-exports.game_list = (req, res) => {
-  res.send("NOT IMPLEMENTED: game list");
+exports.game_list = (req, res, next) => {
+  Game.find({}, "title dev release_date")
+    .sort({title: 1})
+    .exec((err, list_games) => {
+      if (err) {
+        return next(err)
+      }
+      res.render("game_list", {
+        title: "Games List",
+        game_list: list_games,
+      })
+    })
 };
 
 // Display detail page for a specific game.
