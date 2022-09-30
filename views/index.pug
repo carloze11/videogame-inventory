@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #[em The Armory], a weapons cache for games old and new.
+
+  h1 Dynamic content
+
+  if error
+    p Error getting dynamic content.
+  else
+    p The Armory has the following record counts:
+
+    ul
+      li #[strong Weapons:] !{data.weapon_count}
+      li #[strong NicknamedWeapons:] !{data.weaponinstance_count}
+      li #[strong Games:] !{data.game_count}
+      li #[strong Categories:] !{data.category_count}

@@ -1,7 +1,33 @@
-const Wook = require("../models/weapon");
+const Weapon = require("../models/weapon");
+const Game = require("../models/game");
+const Category = require("../models/category");
+const WeaponInstance = require("../models/weaponinstance");
+
+const async = require("async");
 
 exports.index = (req, res) => {
-  res.send("NOT IMPLEMENTED: Site Home Page");
+  async.parallel(
+    {
+    weapon_count(callback){
+      Weapon.countDocuments({}, callback)
+    }, 
+    weaponinstance_count(callback){
+      WeaponInstance.countDocuments({}, callback)
+    },
+    game_count(callback){
+      Game.countDocuments({}, callback)
+    },
+    category_count(callback){
+      Category.countDocuments({}, callback)
+    },
+  },
+  (err, results) => {
+    res.render("index", {
+      title: "The Armory",
+      error: err,
+      data: results,
+    })
+  })
 };
 
 // Display list of all weapons.

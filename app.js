@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const armory = require('./routes/armory')
+require('dotenv').config()
 
 
 
@@ -17,16 +17,15 @@ const armoryRouter = require('./routes/armory')
 var app = express();
 
 // Setting up mongoose
-require('dotenv').config()
 const mongoose = require('mongoose')
 const mongoDB = process.env.MONGODB_URI
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true}, () => console.log('connected to mongo'))
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error"))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
