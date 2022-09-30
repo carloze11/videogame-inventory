@@ -1,13 +1,48 @@
 const Category = require("../models/category");
+const Weapon = require("../models/weapon")
+const async = require("async")
 
 // Display list of all categories.
-exports.category_list = (req, res) => {
-  res.send("NOT IMPLEMENTED: category list");
+exports.category_list = (req, res, next) => {
+  Category.find({}, "type")
+    .exec((err, list_category) => {
+      if (err){
+        return next(err)
+      }
+      res.render("category_list", {
+        title: "Weapon Categories",
+        category_list: list_category,
+      })
+    })
 };
 
 // Display detail page for a specific category.
-exports.category_detail = (req, res) => {
-  res.send(`NOT IMPLEMENTED: category detail: ${req.params.id}`);
+exports.category_detail = (req, res, next) => {
+  async.parallel(
+    {
+      category(callback) {
+        Category.findById(req.params.id).exec(callback)
+      },
+      category_weapons(callback){
+        Weapon.find({category: req.params.id }).exec(callback)
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err)
+      }
+      if (results.category == null) {
+        const err = new Error("Category not found.")
+        err.status = 404;
+        return next(err)
+      }
+      res.render("category_detail", {
+        title: "Category Details",
+        category: results.category,
+        category_weapons: results.category_weapons,
+      })
+    }
+  )
 };
 
 // Display category create form on GET.
