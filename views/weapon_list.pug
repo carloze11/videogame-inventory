@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each weapon in weapon_list
+      li
+        a(href=weapon.url) #{weapon.name}
+        |  (#{weapon.game.title})
+
+    else
+      li There are no weapons.

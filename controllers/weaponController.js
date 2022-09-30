@@ -31,8 +31,17 @@ exports.index = (req, res) => {
 };
 
 // Display list of all weapons.
-exports.weapon_list = (req, res) => {
-  res.send("NOT IMPLEMENTED: weapon list");
+exports.weapon_list = (req, res, next) => {
+  Weapon.find({}, "name game")
+    .sort({game: 1})
+    .populate("game")
+    .exec((err, list_weapons) => {
+      if (err){
+        return next(err)
+      }
+      res.render("weapon_list", {title: "Weapon List", weapon_list: list_weapons})
+    })
+
 };
 
 // Display detail page for a specific weapon.
