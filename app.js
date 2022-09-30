@@ -3,12 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-require('dotenv').config()
-
-
-
-
-
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -16,12 +10,12 @@ const armoryRouter = require('./routes/armory')
 
 var app = express();
 
-// Setting up mongoose
-const mongoose = require('mongoose')
-const mongoDB = process.env.MONGODB_URI
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true}, () => console.log('connected to mongo'))
+// Set up mongoose connection
+const mongoose = require("mongoose");
+const mongoDB = "mongodb+srv://carloze11:oIfI0SQUdVQ0Mor2@cluster0.ang4pik.mongodb.net/the_armory?retryWrites=true&w=majority";
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
-db.on("error", console.error.bind(console, "MongoDB connection error"))
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/armory', armoryRouter)
+app.use('/armory', armoryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
