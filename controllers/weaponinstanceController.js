@@ -1,8 +1,20 @@
 const WeaponInstance = require("../models/weaponinstance");
+const Weapon = require("../models/weapon")
 
 // Display list of all weaponInstances.
-exports.weaponinstance_list = (req, res) => {
-  res.send("NOT IMPLEMENTED: weaponInstance list");
+exports.weaponinstance_list = (req, res, next) => {
+  WeaponInstance.find()
+    .populate("weapon")
+    .exec((err, list_weaponinstances) => {
+      if (err) {
+        return next(err)
+      }
+      res.render("weaponinstance_list", {
+        title: "Weapon Nicknames",
+        weaponinstance_list: list_weaponinstances,
+      })
+    });
+
 };
 
 // Display detail page for a specific weaponInstance.
