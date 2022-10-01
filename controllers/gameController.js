@@ -92,13 +92,67 @@ exports.game_create_post = [
 ]
 
 // Display game delete form on GET.
-exports.game_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: game delete GET");
+exports.game_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      game(callback){
+        Game.findById(req.params.id).exec(callback)
+      },
+      weapons(callback){
+        Weapon.find({game: req.params.id}).exec(callback)
+      }
+    },
+    (err, results) => {
+      if (err) {
+        return next(err)
+      }
+      if (results.game == null){
+        res.redirect("/armory/games")
+      }
+
+      res.render("game_delete", {
+        title: "Delete Game",
+        game: results.game,
+        weapons: results.weapons,
+      })
+    }
+  )
 };
 
 // Handle game delete on POST.
-exports.game_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: game delete POST");
+exports.game_delete_post = (req, res, next) => {
+  async.parallel(
+    {
+      game(callback){
+        Game.findById(req.body.id).exec(callback)
+      },
+      weapons(callback){
+        Weapon.find({game: req.body.id}).exec(callback)
+      }
+    },
+
+    (err, results) => {
+      if (err){
+        return next(err)
+      }
+      if (results.weapons.length > 0) {
+        res.render("game_delete", {
+          title: "Delete Author",
+          game: results.game,
+          weapons: results.weapons
+        })
+        return;
+      }
+      Game.findByIdAndRemove(req.body.gameid, (err) => {
+        if (err) {
+          return next(err)
+        }
+        res.redirect("/armory/games")
+      })
+    }
+
+
+  )
 };
 
 // Display game update form on GET.

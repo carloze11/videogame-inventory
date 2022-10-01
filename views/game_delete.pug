@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h1 #{title}: #{game.title}
+  p= game.released
+
+  if weapons.length
+
+    p #[strong Delete the following weapons before attempting to delete this game.]
+
+    div(style='margin-left:20px;margin-top:20px')
+
+      h4 weapons
+
+      dl
+      each weapon in weapons
+        dt
+          a(href=weapon.url) #{weapon.name}
+        dd #{weapon.description}
+
+  else
+    p Do you really want to delete this game?
+
+    form(method='POST' action='')
+      div.form-group
+        input#gameid.form-control(type='hidden',name='gameid', required='true', value=game._id )
+
+      button.btn.btn-primary(type='submit') Delete
