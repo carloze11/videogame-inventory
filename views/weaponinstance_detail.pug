@@ -1,0 +1,9 @@
+extends layout
+
+block content
+
+  h1 ID: #{weaponinstance._id}
+
+  p #[strong Title:]
+    a(href=weaponinstance.weapon.url) #{weaponinstance.weapon.name}
+  p #[strong Nickname:] #{weaponinstance.nickname}

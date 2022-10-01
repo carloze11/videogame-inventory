@@ -2,6 +2,7 @@ const Weapon = require("../models/weapon");
 const Game = require("../models/game");
 const Category = require("../models/category");
 const WeaponInstance = require("../models/weaponinstance");
+const { body, validationResult } = require("express-validator");
 
 const async = require("async");
 
@@ -45,8 +46,38 @@ exports.weapon_list = (req, res, next) => {
 };
 
 // Display detail page for a specific weapon.
-exports.weapon_detail = (req, res) => {
-  res.send(`NOT IMPLEMENTED: weapon detail: ${req.params.id}`);
+exports.weapon_detail = (req, res, next) => {
+  async.parallel(
+    {
+      weapon(callback){
+        Weapon.findById(req.params.id)
+          .populate("game")
+          .populate("category")
+          .exec(callback)
+      },
+      weaponinstance(callback){
+        WeaponInstance.find({ weapon: req.params.id }).exec(callback)
+      },
+    },
+
+    (err, results) => {
+      if (err) {
+        return next(err)
+      }
+
+      if (results.weapon == null){
+        err = new Error("Weapon not found")
+        err.status = 404;
+        return next(err)
+      }
+
+      res.render("weapon_detail", {
+        title: "Weapon Details",
+        weapon: results.weapon,
+        weaponinstance: results.weaponinstance,
+      })
+    }
+  )
 };
 
 // Display weapon create form on GET.

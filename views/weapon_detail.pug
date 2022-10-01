@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  h1 Title: #{weapon.name}
+
+  p #[strong Game:]
+    a(href=weapon.game.url) #{weapon.game.dev}
+  p #[strong Summary:] #{weapon.description}
+  p #[strong Category:]
+    each val, index in weapon.category
+      a(href=val.url) #{val.type}
+      if index < weapon.category.length - 1
+        |,
+
+  div(style='margin-left:20px;margin-top:20px')
+    h4 Copies
+
+    each val in weaponinstance
+      hr
+      p #[strong A.K.A.:] #{val.nickname}
+
+    else
+      p There are no copies of this weapon in the library.

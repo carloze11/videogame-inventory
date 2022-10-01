@@ -1,5 +1,6 @@
 const WeaponInstance = require("../models/weaponinstance");
 const Weapon = require("../models/weapon")
+const async = require("async")
 
 // Display list of all weaponInstances.
 exports.weaponinstance_list = (req, res, next) => {
@@ -18,8 +19,31 @@ exports.weaponinstance_list = (req, res, next) => {
 };
 
 // Display detail page for a specific weaponInstance.
-exports.weaponinstance_detail = (req, res) => {
-  res.send(`NOT IMPLEMENTED: weaponInstance detail: ${req.params.id}`);
+exports.weaponinstance_detail = (req, res, next) => {
+  async.parallel(
+    {
+      weaponinstance(callback){
+        WeaponInstance.findById(req.params.id)
+          .populate("weapon")
+          .exec(callback)
+      },
+    },
+    (err, results) => {
+      if (err){
+        return next(err)
+      }
+      if (results.weaponinstance == null){
+        err = new Error("There are no weapon instances.")
+        err.status = 404
+        return next(err)
+      }
+      res.render("weaponinstance_detail", {
+        title: "Weapon Instance Details", 
+        weaponinstance: results.weaponinstance,
+      })
+    }
+    
+  )
 };
 
 // Display weaponInstance create form on GET.
