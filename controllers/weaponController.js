@@ -132,7 +132,7 @@ exports.weapon_create_post = [
     if (!errors.isEmpty()){
       async.parallel(
         {
-          gamess(callback){
+          games(callback){
             Game.find(callback);
           },
           categorys(callback){
@@ -151,7 +151,7 @@ exports.weapon_create_post = [
           }
 
           res.render("weapon_form", {
-            name: "Add a New Weapon", 
+            title: "Add a New Weapon", 
             games: results.games,
             categorys: results.categorys,
             errors: errors.array(), 
@@ -160,7 +160,7 @@ exports.weapon_create_post = [
       )
       return;
     }
-    
+
       weapon.save(err => {
         if (err){
           return next(err)
