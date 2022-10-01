@@ -16,4 +16,9 @@ block content
         dd #{weapon.description}
 
       else
-        p This category has no weapons .
+        p This category has no weapons.
+
+  p
+    a(href=category.url+'/delete') Delete category 
+  p
+    a(href=category.url+'/update') Update category

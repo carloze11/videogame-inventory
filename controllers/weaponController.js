@@ -5,6 +5,7 @@ const WeaponInstance = require("../models/weaponinstance");
 const { body, validationResult } = require("express-validator");
 
 const async = require("async");
+const weapon = require("../models/weapon");
 
 exports.index = (req, res) => {
   async.parallel(
@@ -171,13 +172,63 @@ exports.weapon_create_post = [
 ]
 
 // Display weapon delete form on GET.
-exports.weapon_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: weapon delete GET");
+exports.weapon_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      weapon(callback){
+        Weapon.findById(req.params.id).exec(callback)
+      },
+      weaponinstances(callback){
+        WeaponInstance.find({weapon: req.params.id}).exec(callback)
+      }
+    },
+    (err, results) => {
+      if (err){
+        return next(err)
+      }
+      if (results.weapon == null){
+        res.redirect("/armory/weapons")
+      }
+      res.render("weapon_delete", {
+        title: "Delete weapon",
+        weapon: results.weapon,
+        weaponinstances: results.weaponinstances,
+      })
+    }
+  )
 };
 
 // Handle weapon delete on POST.
-exports.weapon_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: weapon delete POST");
+exports.weapon_delete_post = (req, res, next) => {
+  async.parallel(
+    {
+      weapon(callback){
+        Weapon.findById(req.params.id).exec(callback)
+      },
+      weaponinstances(callback){
+        WeaponInstance.find({weapon: req.params.id}).exec(callback)
+      }
+    },
+    (err, results) => {
+      if (err){
+        return next(err)
+      }
+      if (results.weaponinstances > 0) {
+        res.render("weapon_delete", {
+          title: "Delete Weapon",
+          weapon: results.weapon,
+          weaponinstances: results.weaponinstances,
+        })
+        return
+      }
+      Weapon.findByIdAndRemove(req.body.weaponid, (err) => {
+        if (err) {
+          return next(err)
+        }
+        res.redirect("/armory/weapons")
+      })
+    }
+  )
 };
 
 // Display weapon update form on GET.

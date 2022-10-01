@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h1 #{title}: #{weapon.title}
+  p= weapon.description
+
+  if weaponinstances.length
+
+    p #[strong Delete the following weapon instances before attempting to delete this weapon.]
+
+    div(style='margin-left:20px;margin-top:20px')
+
+      h4 Weapon Instances
+
+      dl
+      each weaponinstance in weaponinstances
+        dt
+          a(href=weaponinstance.url) #{weapon.name}
+        dd #{weaponinstance.nickname}
+
+  else
+    p Do you really want to delete this weapon?
+
+    form(method='POST' action='')
+      div.form-group
+        input#weaponid.form-control(type='hidden',name='weaponid', required='true', value=weapon._id )
+
+      button.btn.btn-primary(type='submit') Delete

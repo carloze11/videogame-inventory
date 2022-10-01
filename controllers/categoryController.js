@@ -87,21 +87,120 @@ exports.category_create_post = [
 ]
 
 // Display category delete form on GET.
-exports.category_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: category delete GET");
+exports.category_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      category(callback){
+        Category.findById(req.params.id).exec(callback)
+      },
+      weapons(callback){
+        Weapon.find({category: req.params.id}).exec(callback)
+      }
+    },
+    (err, results) => {
+      if (err){
+        return next(err)
+      }
+      if (results.category == null){
+        res.redirect("/armory/categories")
+      }
+      res.render("category_delete", {
+        title: "Delete Category", 
+        category: results.category,
+        weapons: results.weapons,
+      })
+    }
+  )
 };
 
 // Handle category delete on POST.
-exports.category_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: category delete POST");
+exports.category_delete_post = (req, res, next) => {
+  async.parallel(
+    {
+      category(callback){
+        Category.findById(req.params.id).exec(callback)
+      },
+      weapons(callback){
+        Weapon.find({category: req.params.id}).exec(callback)
+      }
+    },
+    (err, results) => {
+      if (err){
+        return next(err)
+      }
+      if (results.weapons > 0){
+        res.render("category_delete", {
+          title: "Delete Category", 
+          category: results.category,
+          weapons: results.weapons,
+        })
+      }
+      Category.findByIdAndRemove(req.params.categoryid, (err) => {
+        if (err){
+          return next(err)
+        }
+        res.redirect("/armory/categories")
+      })
+    }
+  )
 };
 
 // Display category update form on GET.
-exports.category_update_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: category update GET");
+exports.category_update_get = (req, res, next) => {
+  async.parallel(
+    {
+      category(callback){
+        Category.findById(req.params.id).exec(callback)
+      },
+      weapons(callback){
+        Weapon.find({category: req.params.id}).exec(callback)
+      }
+    },
+    (err, results) => {
+      if (err) {
+        return next(err)
+      }
+      if (results.category == null){
+        err = new Error("Category not found.")
+        err.status = 404
+        return next(err)
+      }
+      res.render("category_form", {
+        title: "Update Category",
+        category: results.category,
+        weapons: results.weapons,
+      })
+    }
+  )
 };
 
 // Handle category update on POST.
-exports.category_update_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: category update POST");
-};
+exports.category_update_post = [
+  body("type", "Type required.").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description required.").trim().isLength({ min: 1 }).escape(),
+  
+  (req, res, next) => {
+    const errors = validationResult(req)
+    const category = new Category({ 
+    type: req.body.type, 
+    description: req.body.description,
+    _id: req.params.id, 
+  })
+
+    if (!errors.isEmpty()){
+      res.render("category_form", {
+        title: "Update Category",
+        category,
+        errors: errors.array(),
+      })
+      return;
+    }
+    
+    Category.findByIdAndUpdate(req.params.id, category, {}, (err, thecategory) => {
+      if (err){
+        return next(err)
+      }
+      res.redirect(thecategory.url)
+    })
+  }
+]

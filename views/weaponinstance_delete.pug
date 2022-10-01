@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1 #{title}: #{weaponinstance.nickname}
+
+  p Do you really want to delete this weapon instance?
+
+    form(method='POST' action='')
+      div.form-group
+        input#weaponinstanceid.form-control(type='hidden',name='weaponinstanceid', required='true', value=weaponinstance._id )
+
+      button.btn.btn-primary(type='submit') Delete
