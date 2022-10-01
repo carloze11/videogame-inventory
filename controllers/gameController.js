@@ -1,6 +1,7 @@
 const Game = require("../models/game");
 const Weapon = require("../models/weapon");
 const async = require("async")
+const { body, validationResult } = require("express-validator");
 
 // Display list of all games.
 exports.game_list = (req, res, next) => {
@@ -48,13 +49,47 @@ exports.game_detail = (req, res, next) => {
 
 // Display game create form on GET.
 exports.game_create_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: game create GET");
+  res.render("game_form", {
+    title: "Enter a New Game",
+  })
 };
 
 // Handle game create on POST.
-exports.game_create_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: game create POST");
-};
+exports.game_create_post = [
+  body("title", "Title must not be empty.").trim().isLength({ min: 1}).escape(),
+  body("dev", "Somebody must have made the game!").trim().isLength({ min: 1}).escape(),
+  body("description", "I wanna know about the game!").trim().isLength({ min: 1}).escape(),
+  body("release_date", "When did it come out?").optional({ checkFalsy: true }).isISO8601().toDate(),
+
+  (req, res,next) => {
+    const errors = validationResult(req)
+    const game = new Game({
+      title: req.body.title, 
+      dev: req.body.dev, 
+      description: req.body.description, 
+      release_date: req.body.release_date,
+    })
+
+    if (!errors.isEmpty()){
+      return next(err)
+    }
+
+    Game.findOne({title: req.body.title}).exec((err, found_game) => {
+      if (err) {
+        return next(err)
+      }
+      if (found_game) {
+        res.redirect(found_game.url)
+      }
+      game.save(err => {
+        if (err){
+          return next(err)
+        }
+        res.redirect(game.url)
+      })
+    })
+  }
+]
 
 // Display game delete form on GET.
 exports.game_delete_get = (req, res) => {
