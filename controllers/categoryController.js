@@ -1,6 +1,7 @@
 const Category = require("../models/category");
 const Weapon = require("../models/weapon")
 const async = require("async")
+const { body, validationResult } = require("express-validator");
 
 // Display list of all categories.
 exports.category_list = (req, res, next) => {
@@ -46,14 +47,44 @@ exports.category_detail = (req, res, next) => {
 };
 
 // Display category create form on GET.
-exports.category_create_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: category create GET");
+exports.category_create_get = (req, res, next) => {
+  res.render("category_form", {
+    title: "Create New Category"
+  })
 };
 
 // Handle category create on POST.
-exports.category_create_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: category create POST");
-};
+exports.category_create_post = [
+  body("type", "Type required.").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description required.").trim().isLength({ min: 1 }).escape(),
+  (req, res, next) => {
+    const errors = validationResult(req)
+    const category = new Category({ type: req.body.type, description: req.body.description })
+
+    if (!errors.isEmpty()){
+      res.render("category_form", {
+        title: "Create New Category",
+        category,
+        errors: errors.array(),
+      })
+      return;
+    }
+    Category.findOne({ type: req.body.type }).exec((err, found_category) => {
+      if (err) {
+        return next(err)
+      }
+      if (found_category) {
+        res.redirect(found_category.url)
+      }
+      category.save((err) => {
+        if (err) {
+          return next(err)
+        }
+        res.redirect(category.url)
+      })
+    })
+  }
+]
 
 // Display category delete form on GET.
 exports.category_delete_get = (req, res) => {

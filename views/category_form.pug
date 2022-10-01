@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='name') Category Type:
+      input#type.form-control(type='text', placeholder='AR, SMG...' name='type' value=(undefined===category ? '' : category.type))
+    div.form-group
+      label(for='name') Category Description:
+      input#description.form-control(type='text', placeholder='Say something about it..' name='description' value=(undefined===category ? '' : category.description))
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors
+   ul
+    for error in errors
+     li!= error.msg
